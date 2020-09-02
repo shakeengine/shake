@@ -5,8 +5,6 @@ import (
 	vk "github.com/vulkan-go/vulkan"
 )
 
-var TEST = ""
-
 func main() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
