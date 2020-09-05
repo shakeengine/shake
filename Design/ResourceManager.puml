@@ -1,0 +1,39 @@
+@startuml
+' !includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+!include C4_Container.puml
+!include C4_Component.puml
+
+LAYOUT_TOP_DOWN
+'LAYOUT_AS_SKETCH
+LAYOUT_WITH_LEGEND()
+
+title ResourceManager
+
+System_Ext(core, "ShakeCore", "/core")
+
+Container_Boundary(resourceManager, "ResourceManager", "/core/resource") {
+    System(resourceLoader, "ResourceLoader", "Provides all feature for loading resources")
+    Component(resourceBunch, "ResourceBunch", "A Bunch of Resources")
+    Component(mapRefCounter, "RefCounter", "Reference counter for ResourceBunches")
+}
+
+Container(fileIO, "FileIO", "/core/io", "Provides all features for I/O. Multi-Platform")
+Container_Boundary(powder, "Powder", "/core/powder") {
+
+}
+
+ComponentDb(assetDB, "AssetDB", "Asset Database made in build-time")
+ComponentDb(assetMemoryDB, "AssetMemoryDB", "In-Memory DB")
+
+Rel(resourceLoader, resourceBunch, "Ref")
+Rel(resourceLoader, mapRefCounter, "APIs")
+Rel(core, resourceLoader, "APIs")
+Rel(resourceLoader, assetDB, "SQL")
+Rel(resourceLoader, assetMemoryDB, "SQL")
+
+Rel(resourceLoader, powder, "Ref")
+
+Rel_Neighbor(resourceLoader, fileIO, "APIs")
+
+@enduml

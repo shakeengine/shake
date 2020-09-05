@@ -1,0 +1,37 @@
+@startuml
+' !includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+!include C4_Container.puml
+!include C4_Component.puml
+
+LAYOUT_TOP_DOWN
+'LAYOUT_AS_SKETCH
+LAYOUT_WITH_LEGEND()
+
+title InputManager
+
+System_Ext(core, "ShakeCore", "/core")
+
+Container_Boundary(inputManager, "InputManager", "/core/input") {
+    Component(mouseListener, "MouseListner", "Process mouse events")
+    Component(keyboardListener, "KeyboarListener", "Process keyboard events")
+    Component(touchListener, "TouchListener", "Process touch events")
+}
+
+Container_Boundary(eventSystem, "EventSystem", "/core/eventsystem") {
+    Component(channel, "EventChannel", "Channel for Event Invoking")
+    Component(eventMaker, "EventMaker", "Making events")
+}
+
+Container_Boundary(physicsManager, "PhysicsManager", "/core/physics") {
+    Component(collisionDetector, "CollisionDetector", "Detecting Collision")
+}
+
+Rel(core, inputManager, "APIs(Init)")
+Rel(inputManager, eventMaker, "APIs")
+Rel(eventMaker, collisionDetector, "APIs")
+
+Rel_Neighbor(eventMaker, channel, "APIs")
+Rel_Back(core, channel, "Channel")
+
+@enduml

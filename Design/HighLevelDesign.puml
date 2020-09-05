@@ -1,0 +1,107 @@
+@startuml
+' !includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+!include C4_Container.puml
+!include C4_Component.puml
+
+LAYOUT_TOP_DOWN
+'LAYOUT_AS_SKETCH
+LAYOUT_WITH_LEGEND()
+
+title HighLevelDesign
+
+Container(core, "ShakeCore", "/core", "A core package")
+Container(resourceManager, "ResourceManager", "/core/resource", "Provides all features to manage resources at runtime")
+ComponentDb(resourceMemoryDB, "ResourceMemoryDB", "sqlite")
+Container(buildPipeline, "BuildPipeline", "/core/build", "Multi-Platform build pipeline")
+Container(inputManager, "InputManager", "/core/input", "Multi-Platform input manager")
+Container(soundManager, "SoundManager", "/core/sound", "Multi-Platform sound manager")
+Container(physicsManager, "PhysicsManager", "/core/physics", "Provides all features about Physics")
+Container(timeManager, "TimeManager", "/core/time", "Provides all features for time")
+
+Container(eventSystem, "EventSystem", "/core/eventsystem", "Event invoking system")
+Container(powderManager, "PowderManager", "/core/powder", "Powder management system which invokes start and update functions")
+
+Container(hrtf, "HRTF", "/core/sound", "Head-Related Transfer Function")
+
+Container(fileio, "FileIO", "/core/io", "Provides all features for I/O")
+
+Container(renderingManager, "RenderingManager", "/core/render", "Provides all features for Rendering")
+Container(hierarchy, "Hierarchy", "/core/render/hierarchy")
+Component(vial, "Vial", "Object in 3D Space")
+Container(particleManager, "ParticleManager", "/core/render/particle", "Manage particles")
+ComponentDb(hierarchyDB, "HierarchyDB", "sqlite")
+
+Container_Boundary(powder, "Powder", "/core/powder") {
+    Component(mesh, "Mesh", "Containing vertex, index and uv")
+    Component(material, "Material", "Containing shader including textures")
+    Component(texture, "Textrue", "Texture images")
+    Component(renderer, "Renderer", "3D Model Renderer")
+    Component(animator, "Animator", "Provides all features to manage animations")
+    Component(particles, "Particles", "Making particles in 3D Space")
+    Component(physics, "Physics", "Making the Vial as a physical object")
+    Component(collider, "Collider", "For collision detecting")
+    Component(transform, "Transform", "For position, rotation and scale")
+    Container(customPowder, "CustomPowder", "Custom Powder")
+}
+
+Container(engine, "ShakeEngine", "/editor", "A editor package")
+Container(assetDatabase, "AssetDatabase", "/editor/asset", "Provides all features to manage assets for editor")
+
+Container_Boundary(builders, "Builders", "External Systems") {
+    System_Ext(androidBuilder, "Android Builder")
+    System_Ext(iosBuilder, "iOS Builder")
+    System_Ext(windowsBuilder, "Windows Builder")
+    System_Ext(linuxBuilder, "Linux Builder")
+}
+
+Rel(core, resourceManager, "APIs")
+Rel(resourceManager, fileio, "APIs")
+Rel(resourceManager, resourceMemoryDB, "SQL")
+
+Rel(engine, core, "APIs")
+Rel(engine, assetDatabase, "APIs")
+Rel(engine, buildPipeline, "APIs")
+Rel(inputManager, eventSystem, "APIs")
+
+Rel(buildPipeline, builders, "APIs")
+Rel(buildPipeline, assetDatabase, "APIs")
+Rel(assetDatabase, fileio, "APIs")
+
+Rel(core, renderingManager, "APIs")
+Rel(core, inputManager, "APIs")
+Rel_Back(core, eventSystem, "Channel")
+
+Rel(core, soundManager, "APIs")
+Rel(soundManager, hrtf, "APIs")
+
+Rel(renderingManager, hierarchy, "APIs")
+Rel(hierarchy, vial, "Ref")
+Rel(vial, powder, "Ref")
+Rel(hierarchy, hierarchyDB, "SQL")
+
+Rel(core, physicsManager, "APIs")
+Rel_Back(physicsManager, eventSystem, "APIs")
+
+Rel(core, timeManager, "APIs")
+
+' Rendering
+Rel(core, particleManager, "APIs")
+Rel(renderingManager, particleManager, "APIs")
+Rel(powderManager, customPowder, "Invoke")
+Rel(core, powderManager, "APIs")
+Rel(resourceManager, powder, "Ref")
+Rel(particleManager, particles, "Ref")
+
+' Physics
+Rel(physicsManager, physics, "APIs")
+Rel(physicsManager, collider, "APIs")
+Rel(physicsManager, customPowder, "Invoke")
+
+' Power
+Rel(material, texture, "Ref")
+Rel(particles, texture, "Ref")
+Rel(renderer, mesh, "Ref")
+Rel(renderer, material, "Ref")
+
+@enduml
