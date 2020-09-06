@@ -3,7 +3,13 @@ module github.com/shakeengine/shake
 go 1.14
 
 require (
-	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e // indirect
+	github.com/therecipe/env_darwin_amd64_513 v0.0.0-20190626001412-d8e92e8db4d0 // indirect
+	github.com/therecipe/env_linux_amd64_513 v0.0.0-20190626000307-e137a3934da6 // indirect
+	github.com/therecipe/env_windows_amd64_513 v0.0.0-20190626000028-79ec8bd06fb2 // indirect
+	github.com/therecipe/env_windows_amd64_513/Tools v0.0.0-20190626000028-79ec8bd06fb2 // indirect
+	github.com/therecipe/qt v0.0.0-20200902190651-63561901e834
+	github.com/therecipe/qt/internal/binding/files/docs/5.12.0 v0.0.0-20200902190651-63561901e834 // indirect
+	github.com/therecipe/qt/internal/binding/files/docs/5.13.0 v0.0.0-20200902190651-63561901e834 // indirect
 	github.com/veandco/go-sdl2 v0.4.4
 	github.com/vulkan-go/vulkan v0.0.0-20200123094538-aa511c71e200
 )

@@ -7,18 +7,18 @@
         {
             "name": "Launch Editor",
             "type": "go",
-			"request": "launch",
-			"mode": "debug",
-			"program": "${workspaceFolder}/editor/main.go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/editor/main.go",
             "env": {},
             "args": []
         },
         {
             "name": "Launch Core",
             "type": "go",
-			"request": "launch",
-			"mode": "debug",
-			"program": "${workspaceFolder}/core/main.go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/core/main.go",
             "env": {},
             "args": []
         },

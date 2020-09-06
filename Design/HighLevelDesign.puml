@@ -45,8 +45,16 @@ Container_Boundary(powder, "Powder", "/core/powder") {
     Container(customPowder, "CustomPowder", "Custom Powder")
 }
 
-Container(engine, "ShakeEngine", "/editor", "A editor package")
-Container(assetDatabase, "AssetDatabase", "/editor/asset", "Provides all features to manage assets for editor")
+Container(editor, "ShakeEditor", "/editor", "A editor package")
+Container(dockManager, "DockManager", "/editor/dock", "Manager for docks")
+Component(sceneView, "SceneView", "/editor/dock/scene", "Render objects in current scene")
+Container_Boundary(dock, "Dock", "/editor/dock") {
+    Component(inspectorView, "InspectorView", "/editor/dock/inspector")
+    Component(projectView, "ProejctView", "/editor/dock/project")
+    Component(hierarchyView, "HierarchyView", "/editor/dock/hierarchy")
+}
+Container(editorMenu, "EditorMenu", "/editor/menu")
+Container(resourceDatabase, "ResourceDatabase", "/editor/resource", "Provides all features to manage resources for editor")
 
 Container_Boundary(builders, "Builders", "External Systems") {
     System_Ext(androidBuilder, "Android Builder")
@@ -59,14 +67,22 @@ Rel(core, resourceManager, "APIs")
 Rel(resourceManager, fileio, "APIs")
 Rel(resourceManager, resourceMemoryDB, "SQL")
 
-Rel(engine, core, "APIs")
-Rel(engine, assetDatabase, "APIs")
-Rel(engine, buildPipeline, "APIs")
+Rel(editor, core, "APIs")
+Rel(editor, resourceDatabase, "APIs")
+Rel(editor, buildPipeline, "APIs")
+Rel(editor, dockManager, "APIs")
+Rel(editor, editorMenu, "APIs")
+Rel(editorMenu, dockManager, "APIs")
+Rel(dockManager, dock, "APIs")
+Rel(editor, sceneView, "APIs")
+Rel(sceneView, hierarchy, "Ref")
+Rel(hierarchyView, hierarchy, "Ref")
+Rel(projectView, hierarchy, "Ref")
 Rel(inputManager, eventSystem, "APIs")
 
 Rel(buildPipeline, builders, "APIs")
-Rel(buildPipeline, assetDatabase, "APIs")
-Rel(assetDatabase, fileio, "APIs")
+Rel(buildPipeline, resourceDatabase, "APIs")
+Rel(resourceDatabase, fileio, "APIs")
 
 Rel(core, renderingManager, "APIs")
 Rel(core, inputManager, "APIs")
