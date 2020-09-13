@@ -1,55 +1,122 @@
-// #cgo LDFLAGS: -lole32 -loleaut32 -limm32 -lversion
 package main
 
 import (
+	"fmt"
 	"os"
 
+	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	vk "github.com/vulkan-go/vulkan"
 
 	"github.com/shakeengine/shake/editor/dock"
 	"github.com/shakeengine/shake/editor/dock/scene"
 	"github.com/shakeengine/shake/editor/menu"
+	"github.com/shakeengine/shake/editor/selector"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
-func initUIFrame() {
-	app := widgets.NewQApplication(len(os.Args), os.Args)
+const (
+	canvasObjectName  = "Canvas"
+	windowTitle       = "Shake Engine Editor"
+	windowTitleFormat = "Shake Engine Editor - %s"
+)
 
-	window := widgets.NewQMainWindow(nil, 0)
-	window.SetMinimumSize2(250, 200)
-	window.SetWindowTitle("Shake Engine Editor")
+// ShakeEditorWindow : the main frame editor window.
+type ShakeEditorWindow struct {
+	main        *widgets.QMainWindow
+	projectPath string
+	sceneView   *scene.SceneView
+}
 
-	menu.SetMainWindow(window)
+// NewShakeEditorWindow : Main Shake editor window.
+func NewShakeEditorWindow() *ShakeEditorWindow {
+	window := &ShakeEditorWindow{}
+	window.init()
+
+	selector.NewProjectListWindow(window.main, func(path string) {
+		// Callback when user select a project to open.
+		window.openProject(path)
+	}, func() {
+		// If window.projectPath is not empty, open the project because the project has been selected in ProjectListWindow.
+		// Otherwise, just close this main ShakeEditorWindow.
+		if window.projectPath == "" {
+			window.main.Close()
+		}
+	})
+
+	return window
+}
+
+func (window *ShakeEditorWindow) init() {
+	///------------------------------------------
+	/// MainWindow - mainWindow
+	/// -> Widget - widget
+	///    -> VBoxLayout
+	///       -> Widget - canvas
+	window.main = widgets.NewQMainWindow(nil, 0)
+	mainWindow := window.main
+	mainWindow.SetMinimumSize2(800, 480)
+	mainWindow.SetWindowTitle(windowTitle)
+
+	menu.SetMainWindow(mainWindow)
 	menu.InitDefaultMenu()
 
 	widget := widgets.NewQWidget(nil, 0)
 	widget.SetLayout(widgets.NewQVBoxLayout())
-	window.SetCentralWidget(widget)
+	mainWindow.SetCentralWidget(widget)
 
-	input := widgets.NewQLineEdit(nil)
-	input.SetPlaceholderText("Write something ...")
-	widget.Layout().AddWidget(input)
-
-	button := widgets.NewQPushButton2("and click me!", nil)
-	button.ConnectClicked(func(bool) {
-		widgets.QMessageBox_Information(nil, "OK", input.Text(), widgets.QMessageBox__Ok, widgets.QMessageBox__Ok)
-	})
-	widget.Layout().AddWidget(button)
-
-	dock.Init(window)
+	dock.Init(mainWindow)
 
 	canvas := widgets.NewQWidget(nil, 0)
+	canvas.SetObjectName(canvasObjectName)
 	widget.Layout().AddWidget(canvas)
+	///------------------------------------------
 
-	scene.Init(canvas)
+	mainWindow.Show()
+}
 
-	window.Show()
-	app.Exec()
+func (window *ShakeEditorWindow) openProject(projectPath string) {
+	window.projectPath = projectPath
+
+	// Change the window title to represent project path.
+	window.main.SetWindowTitle(fmt.Sprintf(windowTitleFormat, window.projectPath))
+
+	// Initialize SceneView.
+	window.initSceneView()
+
+	// Give project path to DockManager.
+	dock.SetProjectPath(window.projectPath)
+	dock.OpenProjectView()
+}
+
+// initSceneView : Open a SceneView.
+// ShakeEditorWindow manage SceneView directly because SceneView is not a dock.
+func (window *ShakeEditorWindow) initSceneView() {
+	// If SceneView exists, destroy it.
+	if window.sceneView != nil {
+		window.sceneView.Destroy()
+		window.sceneView = nil
+	}
+	// Find the canvas object.
+	canvasObject := window.main.FindChild(canvasObjectName, core.Qt__FindChildrenRecursively)
+	canvas := widgets.NewQWidgetFromPointer(canvasObject.Pointer())
+	// Create a SceneView instance.
+	window.sceneView = scene.NewSceneView(canvas)
 }
 
 func initVulkan() {
+	// Initialize somethings for vulkan.
+	// Do not use defer in this function because instances for vulkan must remain until the shake editor being closed.
+
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+		panic(err)
+	}
+
+	// In order to use font to show some texts for debugging.
+	if err := ttf.Init(); err != nil {
 		panic(err)
 	}
 
@@ -74,13 +141,17 @@ func initVulkan() {
 
 func releaseVulkan() {
 	sdl.VulkanUnloadLibrary()
+	ttf.Quit()
 	sdl.Quit()
 }
 
 func main() {
+	app := widgets.NewQApplication(len(os.Args), os.Args)
+
 	initVulkan()
+	defer releaseVulkan()
 
-	initUIFrame()
+	NewShakeEditorWindow()
 
-	releaseVulkan()
+	app.Exec()
 }

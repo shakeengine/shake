@@ -10,12 +10,12 @@ var mainWindow *widgets.QMainWindow = nil
 
 var mapCategory map[string]*widgets.QMenu = map[string]*widgets.QMenu{}
 
-// SetMainWindow : Set main window for menubar
+// SetMainWindow : Set main window for menubar.
 func SetMainWindow(window *widgets.QMainWindow) {
 	mainWindow = window
 }
 
-// AddCategory : Add a category to menubar of main window
+// AddCategory : Add a category to menubar of main window.
 func AddCategory(category string) error {
 	if mainWindow == nil {
 		return errors.New("mainWindow is null")
@@ -28,7 +28,7 @@ func AddCategory(category string) error {
 	return nil
 }
 
-// AddMenu : Add a menu and link a invoke function
+// AddMenu : Add a menu and link a invoke function.
 func AddMenu(category, menu string, f func(b bool)) error {
 	if qmenu, ok := mapCategory[category]; ok {
 		qmenu.AddAction(menu).ConnectTriggered(f)
@@ -37,7 +37,7 @@ func AddMenu(category, menu string, f func(b bool)) error {
 	return errors.New("Cannot find the category")
 }
 
-// Clear : Clear all menus and categories
+// Clear : Clear all menus and categories.
 func Clear() {
 	mainWindow.MenuBar().Clear()
 }

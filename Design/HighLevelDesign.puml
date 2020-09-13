@@ -46,6 +46,7 @@ Container_Boundary(powder, "Powder", "/core/powder") {
 }
 
 Container(editor, "ShakeEditor", "/editor", "A editor package")
+Container(projectSelector, "ProjectSelector", "/editor/selector", "Window for project selecting")
 Container(dockManager, "DockManager", "/editor/dock", "Manager for docks")
 Component(sceneView, "SceneView", "/editor/dock/scene", "Render objects in current scene")
 Container_Boundary(dock, "Dock", "/editor/dock") {
@@ -66,6 +67,8 @@ Container_Boundary(builders, "Builders", "External Systems") {
 Rel(core, resourceManager, "APIs")
 Rel(resourceManager, fileio, "APIs")
 Rel(resourceManager, resourceMemoryDB, "SQL")
+
+Rel_Neighbor(editor, projectSelector, "APIs")
 
 Rel(editor, core, "APIs")
 Rel(editor, resourceDatabase, "APIs")

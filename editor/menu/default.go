@@ -6,12 +6,12 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-// InitDefaultMenu : Add default menus
+// InitDefaultMenu : Add default menus.
 func InitDefaultMenu() {
 	misc.ErrorCheck(AddCategory("File"))
 	misc.ErrorCheck(AddMenu("File", "Open", func(b bool) {
 		dir := widgets.QFileDialog_GetExistingDirectory(nil, "OK", "", 0)
-		dock.OpenProjectDirectory(dir)
+		dock.SetProjectPath(dir)
 		dock.OpenProjectView()
 	}))
 
